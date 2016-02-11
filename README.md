@@ -1,12 +1,17 @@
 # Assignments
 
 Its a maven based project. You can import it as a Maven project
+
 While deploying the application, you can pass (not mandatory) an JVM argument as  -Dshopping_cart_path="D:\Application\shoppingcart" to specify the location of log file
+
 The application uses MongoDB as backEnd, so a mongod instance needs to be running at the default port of 27017 for this application to work. The mongod instance is also needed for some of the unit tests to run as these are more of integration tests.
+
 Below are the urls for using the REST application:
-       Create item:
+
+	Create item:
              http://localhost:8080/shoppingcart/items 
              Request payload: [{"name":"Tea","category":"B","cost":"100.00"},{"name":"Coffee","category":"A","cost":"100.00"}]
+
 
 
        Create bill:
