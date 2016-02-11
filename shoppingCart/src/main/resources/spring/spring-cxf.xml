@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:jaxws="http://cxf.apache.org/jaxws"
+  xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+  xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://cxf.apache.org/jaxrs
+http://cxf.apache.org/schemas/jaxrs.xsd
+http://cxf.apache.org/jaxws
+http://cxf.apache.org/schemas/jaxws.xsd
+http://www.springframework.org/schema/context
+ 	http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+ 
+  <!-- do not use import statements if CXFServlet init parameters link to this beans.xml -->
+ 
+  <import resource="classpath:META-INF/cxf/cxf.xml" />
+  <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+  <context:component-scan base-package="com.mediaocean.shopping.rest*" />
+  
+  <bean id="jsonProvider"
+        class="org.codehaus.jackson.jaxrs.JacksonJsonProvider">
+  </bean>
+  
+ 
+ 	<jaxrs:server id="billingService" address="/bills">
+        <jaxrs:serviceBeans>
+           <ref bean="billingServiceImpl"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean='jsonProvider' />
+        </jaxrs:providers>
+     </jaxrs:server> 
+     
+ 	<jaxrs:server id="itemService" address="/items">
+        <jaxrs:serviceBeans>
+           <ref bean="itemServiceImpl"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean='jsonProvider' />
+        </jaxrs:providers>
+     </jaxrs:server>  
+     
+ 	<bean id="jacksonObjectMapper" class="org.codehaus.jackson.map.ObjectMapper">
+    	<property name="serializationInclusion" value="NON_NULL"/>
+	</bean>
+	
+     <bean id="billingServiceImpl" class="com.mediaocean.shoppingcart.rest.service.BillingRESTServiceImpl">
+         <property name="billingDAOService" ref="billingDAOMongoImpl"/>
+         <property name="itemDAOService" ref="itemDAOMongoImpl"/>
+     </bean> 
+     
+     <bean id="itemServiceImpl" class="com.mediaocean.shoppingcart.rest.service.ItemRESTServiceImpl">
+     	<property name="itemDAOService" ref="itemDAOMongoImpl"/>
+     </bean> 
+     
+     <bean id="mongoUtil" class="com.mediaocean.shopping.util.MongoUtil"/>
+    
+     <bean id="mongoResource" class="com.mediaocean.shoppingcart.dao.mongo.impl.MongoResource">
+    	<property name="dbUri" value="mongodb://localhost:27017/rf_maphub_temp?ssl=false"/>
+    	<property name="dbName" value="shoppingcart"/>
+     </bean>
+     
+     <bean id="baseDAOMongoImpl" abstract="true"
+		class="com.mediaocean.shoppingcart.dao.mongo.impl.BaseDAOMongoImpl">
+		<property name="mongoResource" ref="mongoResource" />
+		<property name="mongoUtil" ref="mongoUtil"/>
+	</bean>
+    
+     <bean id="itemDAOMongoImpl" parent="baseDAOMongoImpl" class="com.mediaocean.shoppingcart.dao.mongo.impl.ItemDAOMongoImpl">
+    	<property name="collectionName" value="items"/>
+     </bean>
+     
+      <bean id="billingDAOMongoImpl" parent="baseDAOMongoImpl" class="com.mediaocean.shoppingcart.dao.mongo.impl.BillingDAOServiceMongoImpl">
+    	<property name="collectionName" value="bills"/>
+     </bean>
+     
+</beans>
